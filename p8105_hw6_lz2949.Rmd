@@ -8,6 +8,7 @@ output: github_document
 library(tidyverse)
 library(modelr)
 library(p8105.datasets)
+library(boot)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -46,3 +47,57 @@ weather_df =
   select(name, id, everything())
 ```
 
+```{r}
+tmax_fit = weather_df |>
+  lm(tmax ~ tmin + prcp, data = _)
+```
+
+```{r}
+# run a bootstrap
+tmax_boot = weather_df |> 
+  modelr::bootstrap(n = 5000) |> 
+  mutate(
+    models = map(strap, \(df) lm(tmax ~ tmin + prcp, data = df)),
+    results = map(models, broom::tidy),
+    glance = map(models, broom::glance)) |>
+  select(results, glance) |>
+  unnest(results,glance)
+
+r_squared_values = tmax_boot |>
+  filter(term == "(Intercept)") |>
+  select(r.squared)
+
+log_beta_values = tmax_boot |>
+  filter(term == "tmin"| term == "prcp") |>
+  select(estimate) 
+
+log_product_value = mutate(log_beta_values, group = rep(1:(n() / 2), each = 2)) |>
+  group_by(group) |>
+  summarize(log_product = log(prod(estimate)))
+
+# MANY NaN NOT SURE!
+```
+
+```{r}
+# confidence interval r^2
+r_squared_values |>
+  summarize(ci_lower = quantile(r.squared, 0.025), 
+            ci_upper = quantile(r.squared, 0.975))
+
+log_product_value |>
+  summarize(ci_lower = quantile(log_product, 0.025, na.rm = TRUE), 
+            ci_upper = quantile(log_product, 0.975, na.rm = TRUE))
+```
+
+```{r}
+# plot the distribution of estimates
+estimated_data = cbind(r_squared_values, log_product_value) 
+
+ggplot(estimated_data, aes(x = r.squared)) +geom_density()
+```
+interpretation: 
+
+```{r}
+ggplot(estimated_data, aes(x = log_product)) +geom_density()
+```
+interpretation: 
