@@ -171,6 +171,7 @@ interpretation:
 
 ```{r}
 ggplot(estimated_data, aes(x = log_product)) +geom_density()
+# report how many NaN in the dataset
 ```
 interpretation: 
 
@@ -248,12 +249,12 @@ b_df =
     lbga_mod = map(train, \(df) lm(bwt ~ blength + gaweeks, data = df)),
     hcls_mod = map(train, \(df) lm(bwt ~ bhead + blength + babysex + bhead * blength * babysex, data = df))) |> 
   mutate(
-    prop_linear = map2_dbl(prop_lm, test, \(mod, df) rmse(model = mod, data = df)),
-    lbga_linear = map2_dbl(lbga_mod, test, \(mod, df) rmse(model = mod, data = df)),
-    hcls_smooth = map2_dbl(hcls_mod, test, \(mod, df) rmse(model = mod, data = df)))
+    rmse_prop_linear = map2_dbl(prop_lm, test, \(mod, df) rmse(model = mod, data = df)),
+    rmse_lbga_linear = map2_dbl(lbga_mod, test, \(mod, df) rmse(model = mod, data = df)),
+    rmse_hcls_smooth = map2_dbl(hcls_mod, test, \(mod, df) rmse(model = mod, data = df)))
 ```
 
-```{r, eval = FALSE}
+```{r}
 # plot the preiction error 
 b_df |> 
   select(starts_with("rmse")) |> 
@@ -263,9 +264,11 @@ b_df |>
     values_to = "rmse",
     names_prefix = "rmse_") |> 
   mutate(model = fct_inorder(model)) |> 
-  ggplot(aes(x = model, y = rmse)) + geom_violin()
+  ggplot(aes(x = model, y = rmse)) + geom_violin() +
+  xlab("Models") + ylab("rmse values") +labs(title = "rmse values' Violin plots for three models")
 ```
 
+interpretation: 
 
 
 
