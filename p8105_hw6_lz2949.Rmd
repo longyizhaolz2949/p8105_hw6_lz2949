@@ -154,14 +154,18 @@ log_product_value = mutate(log_beta_values, group = rep(1:(n() / 2), each = 2)) 
 
 ```{r}
 # confidence interval r^2
-r_squared_values |>
+r_interval = r_squared_values |>
   summarize(ci_lower = quantile(r.squared, 0.025), 
             ci_upper = quantile(r.squared, 0.975))
 
+cat("The 95% confidence interval for r-square is (", r_interval$ci_lower, ",", r_interval$ci_upper, ")\n")
+
 # confidence interval log(B*B)
-log_product_value |>
+log_interval = log_product_value |>
   summarize(ci_lower = quantile(log_product, 0.025, na.rm = TRUE), 
             ci_upper = quantile(log_product, 0.975, na.rm = TRUE))
+
+cat("The 95% confidence interval for log products is (", log_interval$ci_lower, ",", log_interval$ci_upper, ")\n")
 ```
 
 ```{r}
@@ -220,7 +224,7 @@ bwt_df |>
   modelr::add_residuals(prop_lm) |>
   modelr::add_predictions(prop_lm) |>
   ggplot(aes(x = pred, y = resid)) + geom_point() +
-  ylab("Residual") +xlab("Fitted values") +labs(title = "plot of resitual against fitted values")
+  ylab("Residual") +xlab("Fitted values") +labs(title = "plot of residual against fitted values")
 ```
 Description: The idea that mothers who experience a more substantial weight gain during prenancy are likely to deliver babies with higher birth weights immediately comes to my mind. I first plot the baby birthweight vs. mother's weight gain during pregnancy and fit a line to see the trend, the line has a positive slope, indicating that there is a positive correlation between mother's weight gain and birth weight of baby. Then I build the slr. 
 <br>
