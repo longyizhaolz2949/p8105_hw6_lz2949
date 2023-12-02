@@ -172,14 +172,14 @@ ggplot(estimated_data, aes(x = r.squared)) +
   geom_density() + 
   labs(title = "Distribution plot of r.squared")
 ```
-interpretation: In the log product calculation, 
+Interpretation: r-squared typically ranges from 0 to 1, where 0 indicates the model does not explain any of the variance, and 1 indicates the model explains all of the variance. The plotted r squared distribution is close to normal, centered around 0.92, showing the model fits the data in a pretty good way. 
 
 ```{r}
 ggplot(estimated_data, aes(x = log_product)) +geom_density() +
   labs(title = "Distribution plot of log product")
 # report how many NaN in the dataset
 ```
-interpretation: Lots of Beta2 are negative values, leading to log(negative numbers) which does not exist in real number space. Among 5000 log products, `r estimated_data |> filter(log_product == "NaN") |> count()` of them are NaN. Which counts for `r (estimated_data |> filter(log_product == "NaN") |> count())/5000*100` percent of 5000 data points. The distribution plot of r.squared is almost normally distributed between 0.86 to 0.96, with the center around 0.92. The distribution plot of log products, however, is clearly not normally distributed, it is left-skewed and has a heavy tail extending to low values, values around -6 has the highest density. Features like that may be related to the frequency with with large outliers are included in the bootstrap sample. 
+Interpretation: Lots of Beta2 are negative values, leading to log(negative numbers) which does not exist in real number space. Among 5000 log products, `r estimated_data |> filter(log_product == "NaN") |> count()` of them are NaN. Which counts for `r (estimated_data |> filter(log_product == "NaN") |> count())/5000*100` percent of 5000 data points. The distribution plot of log products is clearly not normally distributed, it is left-skewed and has a heavy tail extending to low values, values around -6 has the highest density. Features like that may be related to the frequency with with large outliers are included in the bootstrap sample. 
 
 
 ## Problem 3
@@ -268,7 +268,7 @@ b_df |>
   xlab("Models") + ylab("rmse values") +labs(title = "rmse values' Violin plots for three models")
 ```
 
-Interpretation: From the violin plot, it can be see that the second and third models are better than the first one, they have lower rmse values, indicating they have smaller prediction error. Probabily because the first model only uses 1 factor as the predictor and the second and third use more complex model than the first one which will fit data in a better way. 
+Interpretation: RMSE is a measure of the average deviation between the observed values and predicted values by the regression model. A lower RMSE indicates a better fit of the model to the data. From the violin plot, it can be see that the second and third models are better than the first one, they have lower RMSE values, indicating they have smaller prediction error. This is probably because the first model only uses 1 factor as the predictor and the second and third use more complex model than the first one which will explain more variances and thus fit data in a better way. 
 
 
 
